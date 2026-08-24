@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="链网E判标志">
+  <defs>
+    <filter id="shadow" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="5" stdDeviation="5" flood-color="#3b0309" flood-opacity=".25"/>
+    </filter>
+  </defs>
+  <path d="M35 12h58l29 52-29 52H35L6 64z" fill="#fffaf7" stroke="#f1c9c8" stroke-width="4" filter="url(#shadow)"/>
+  <path d="M35 40h24l10 12-10 12H35L25 52zM69 64h24l10 12-10 12H69L59 76z" fill="none" stroke="#8b101d" stroke-width="7" stroke-linejoin="round"/>
+  <circle cx="64" cy="64" r="8" fill="#8b101d"/>
+</svg>

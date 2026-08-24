@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<meta content="#a30c16" name="theme-color"/>
+<script>try{if(new URLSearchParams(location.search).get("query")==="1")document.documentElement.classList.add("direct-query-mode")}catch(_){}</script>
+<style>html.direct-query-mode #landing{display:none!important}html.direct-query-mode #dashboard[hidden]{display:block!important}</style>
+<!-- compatibility-build: 20260802.1 -->
+<title>链网E判｜关联交易欺诈实时风险雷达</title>
+<link href="/static/assets/logo.svg?v=20260802.4" rel="icon" type="image/svg+xml"/>
+<link href="/static/styles.css?v=20260802.4" rel="stylesheet"/>
+</head>
+<body data-page="query">
+<section aria-label="链网E判首页" class="landing" id="landing">
+<video autoplay="" class="landing-video" id="heroVideo" loop="" muted="" playsinline="" preload="metadata">
+<source src="/static/assets/video/hero-bg.mp4" type="video/mp4"/>
+</video>
+<div aria-hidden="true" class="landing-fallback"><div class="grid-plane"></div><div class="orb orb-a"></div><div class="orb orb-b"></div><div class="orb orb-c"></div></div>
+<div class="landing-mask"></div>
+<div class="landing-brand" id="landingBrand">
+<img alt="链网E判标志" src="/static/assets/logo.svg?v=20260802.4"/>
+<p class="landing-eyebrow">CORPORATE CREDIT RISK RADAR</p>
+<h1>链网E判</h1>
+<p class="landing-subtitle">面向银行对公信贷的关联交易欺诈实时风险雷达</p>
+<button class="start-button" id="startButton" type="button"><span>开始使用</span><b>→</b></button>
+<p class="landing-hint">移动鼠标唤醒风险雷达</p>
+</div>
+</section>
+<main class="dashboard" hidden="" id="dashboard">
+<header class="topbar">
+<a aria-label="返回查询区" class="brand" href="#searchSection">
+<img alt="" src="/static/assets/logo.svg?v=20260802.4"/>
+<span><strong>链网E判</strong><small>面向银行对公信贷的关联交易欺诈实时风险雷达</small></span>
+</a>
+<nav aria-label="页面导航" class="topnav"><a href="#searchSection">风险查询</a><button class="history-nav-button" data-history-open="" type="button">历史查询</button></nav>
+<div class="model-pill"><i></i><span id="modelLabel">DeepSeek V4 Flash + Tavily</span></div>
+</header>
+<section class="search-hero" id="searchSection">
+<div class="search-decor decor-one"></div><div class="search-decor decor-two"></div>
+<div class="search-title">
+<span class="section-kicker">REAL-TIME DUE DILIGENCE</span>
+<h2>企业关联交易风险查询</h2>
+</div>
+<form autocomplete="off" class="search-box" id="searchForm">
+<label class="sr-only" for="companyQuery">企业查询条件</label>
+<span class="search-icon">⌕</span>
+<input aria-autocomplete="none" autocapitalize="off" autocomplete="new-password" data-form-type="other" data-lpignore="true" id="companyQuery" name="company_lookup_no_history" readonly="readonly" placeholder="请输入企业名称、股票代码或统一社会信用代码" spellcheck="false" value=""/>
+<button type="submit"><span>开始分析</span><b>→</b></button>
+</form>
+<div class="capability-row">
+<article><b>01</b><span><strong>并行检索</strong><small>Tavily聚焦搜索，按需读取正文</small></span></article>
+<article><b>02</b><span><strong>快速抽取</strong><small>V4 Flash三路并行抽取，紧凑决策分析</small></span></article>
+<article><b>03</b><span><strong>可信决策</strong><small>确定性评分、图谱与证据链</small></span></article>
+</div>
+<div aria-live="polite" class="service-status" id="serviceStatus"><span>正在检查API配置…</span></div>
+<section aria-live="polite" class="loading-panel" hidden="" id="loadingPanel">
+<div aria-hidden="true" class="radar-loader"><span></span><span></span><i></i></div>
+<h2>正在生成企业风险分析报告</h2>
+<p id="loadingText">正在启动实时公开信息尽调</p>
+<div class="progress-track"><i id="progressBar"></i></div>
+<strong class="progress-value" id="progressValue">0%</strong>
+<div class="loading-steps">
+<div data-step="0"><i>1</i><span>主体识别</span></div><div data-step="1"><i>2</i><span>并行检索</span></div><div data-step="2"><i>3</i><span>结构抽取</span></div><div data-step="3"><i>4</i><span>精准补全</span></div><div data-step="4"><i>5</i><span>风险计算</span></div>
+</div>
+<button class="ghost-button" id="cancelLoading" type="button">返回查询</button>
+</section>
+</section>
+
+<footer class="footer"><img alt="" src="/static/assets/logo.svg?v=20260802.4"/><span>链网E判 · 关联交易欺诈实时风险雷达</span><small>本系统仅使用公开网页证据进行初筛，不能替代法定尽职调查和人工审批。</small></footer>
+</main>
+<dialog aria-labelledby="errorDialogTitle" class="error-dialog" id="errorDialog">
+<div class="error-dialog-accent"></div>
+<div class="error-dialog-head"><span>!</span><div><small>QUERY INTERRUPTED</small><h2 id="errorDialogTitle">查询未完成</h2></div></div>
+<p id="errorDialogMessage">服务暂时不可用。</p>
+<code id="errorDialogCode"></code>
+<div class="error-dialog-actions"><button id="errorDialogClose" type="button">返回修改查询</button></div>
+</dialog>
+<script defer="" src="/static/query.js?v=20260802.4"></script>
+
+<aside aria-hidden="true" class="history-drawer" id="historyDrawer">
+<div class="history-backdrop" data-history-close=""></div>
+<section aria-labelledby="historyTitle" aria-modal="true" class="history-panel" role="dialog">
+<header><div><small>QUERY ARCHIVE</small><h2 id="historyTitle">历史查询</h2></div><button aria-label="关闭" data-history-close="" type="button">×</button></header>
+<div class="history-list" id="historyList"><p class="history-empty">正在读取历史记录…</p></div>
+</section>
+</aside>
+</body>
+</html>

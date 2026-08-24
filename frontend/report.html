@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+<head>
+<!-- compatibility marker: 20260729.3 -->
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<meta content="#a30c16" name="theme-color"/>
+<title>链网E判｜企业风险完整报告</title>
+<link href="/static/assets/logo.svg?v=20260802.4" rel="icon" type="image/svg+xml"/>
+<link href="/static/styles.css?v=20260802.4" rel="stylesheet"/>
+</head>
+<body data-page="report"><div class="report-loading-veil" id="reportLoadingVeil"><div class="report-orbit"><i></i><i></i><i></i></div><strong>正在打开完整报告</strong><span>同步历史记录与可追溯证据</span></div>
+
+<main class="dashboard report-dashboard" id="dashboard">
+<header class="topbar">
+<a aria-label="返回查询区" class="brand" href="/?query=1">
+<img alt="" src="/static/assets/logo.svg?v=20260802.4"/>
+<span><strong>链网E判</strong><small>面向银行对公信贷的关联交易欺诈实时风险雷达</small></span>
+</a>
+<nav aria-label="页面导航" class="topnav"><a href="/?query=1">风险查询</a><button class="history-nav-button" data-history-open="" type="button">历史查询</button></nav>
+<div class="model-pill"><i></i><span id="modelLabel">DeepSeek V4 Flash + Tavily</span></div>
+</header>
+
+
+<div class="report-area report-page-shell" id="reportArea">
+<section class="report-toolbar">
+<button class="ghost-button" id="backToSearch">← 返回查询</button>
+<div><span id="reportIdText"></span><button class="ghost-button" id="exportJson">导出报告 JSON</button><button class="solid-button" id="printReport">打印 / 保存 PDF</button></div>
+</section>
+<nav aria-label="报告章节导航" class="report-progress-nav" id="reportProgressNav">
+<i id="reportReadingProgress"></i>
+<button class="active" data-report-target="overviewSection" type="button"><span>01</span>企业概览</button>
+<button data-report-target="graphSection" type="button"><span>02</span>关联图谱</button>
+<button data-report-target="decisionSection" type="button"><span>03</span>风险研判</button>
+<button data-report-target="workbenchSection" type="button"><span>04</span>决策工具</button>
+<button data-report-target="traceSection" type="button"><span>05</span>审计链路</button>
+<button data-report-target="evidenceSection" type="button"><span>06</span>公开证据</button>
+</nav>
+<section class="report-overview reveal-section result-enter result-section" data-enter="left" id="overviewSection">
+<section class="panel company-panel result-fragment" style="--fragment-delay:0ms">
+<div class="panel-heading"><div><span class="heading-icon">▦</span><h2>企业基本信息</h2></div><span class="data-badge" id="dataModeBadge">实时公开信息</span></div>
+<h3 id="companyName">—</h3><div class="company-title-line"></div>
+<div class="info-grid" id="companyInfoGrid"></div>
+</section>
+<section class="panel summary-panel result-fragment" style="--fragment-delay:90ms">
+<div class="risk-gauge-wrap">
+<div class="risk-gauge" id="riskGauge"><div><strong id="riskScore">—</strong><small>风险分</small></div></div>
+<h3 id="riskLevel">—</h3><p id="riskCaption">公开证据初筛风险分</p>
+</div>
+<div class="metrics-grid" id="metricsGrid"></div>
+<div class="analysis-meta"><strong>分析完成时间</strong><span id="analysisTime">—</span><strong>公开来源</strong><span id="dataSources">—</span><strong>模型状态</strong><span id="modelStatus">—</span><strong>检索消耗</strong><span id="searchUsage">—</span></div>
+</section>
+<section class="panel credit-judgment-panel result-fragment" id="creditJudgmentPanel" style="--fragment-delay:150ms">
+  <div class="judgment-visual">
+    <div class="judgment-orbit" id="judgmentOrbit"><i></i><i></i><i></i><span><small>自主研判</small><strong id="judgmentGrade">—</strong><em id="judgmentStance">待核验</em><u id="judgmentOrbitPercent">0%</u></span></div>
+    <div class="judgment-meter"><span>分析置信度</span><b><i id="judgmentConfidenceBar"></i></b><strong id="judgmentConfidence">—</strong></div>
+  </div>
+  <div class="judgment-content">
+    <div class="judgment-heading"><small>BANK CREDIT JUDGMENT</small><h2 id="judgmentHeadline">正在形成自主研判结论</h2><p id="judgmentSummary">系统将依据公开证据、财务压力与重大风险底线给出三档判断。</p></div>
+    <div class="judgment-drivers" id="riskBrief"></div>
+    <section class="judgment-suggestions" aria-labelledby="judgmentSuggestionsTitle">
+      <div class="judgment-suggestions-head"><span id="judgmentSuggestionsTitle">针对本企业的建议</span><small>依据本次公开证据与风险归因生成</small></div>
+      <ol id="judgmentSuggestions"><li>正在形成个性化核验建议…</li></ol>
+    </section>
+  </div>
+  <aside class="judgment-path"><small>ANALYSIS PATH</small><ol id="judgmentLogic"><li>主体核验</li><li>证据归因</li><li>偿债压力测试</li><li>三档判定</li></ol></aside>
+</section>
+<section class="visual-grid">
+<article class="panel chart-panel result-fragment" style="--fragment-delay:180ms"><div class="panel-heading"><div><span class="heading-icon">▥</span><h2>风险维度柱状图</h2></div></div><div class="dimension-chart" id="dimensionChart"></div></article>
+<article class="panel chart-panel result-fragment" style="--fragment-delay:270ms"><div class="panel-heading"><div><span class="heading-icon">⌁</span><h2>风险趋势</h2></div></div><div class="trend-chart" id="trendChart"></div></article>
+</section>
+</section>
+<section class="panel graph-panel result-enter result-section" data-enter="right" id="graphSection">
+<div class="graph-title-row"><div><h2>企业关联交易风险图谱</h2></div><div class="graph-export"><button class="blue-button" id="exportSvg">⇩ 导出 SVG</button><button class="blue-button" id="exportPng">⇩ 导出 PNG</button></div></div>
+<div class="graph-legend"><span><i class="critical"></i>高风险事项</span><span><i class="medium"></i>中风险事项</span><span><i class="equity"></i>股权控制</span><span><i class="investment"></i>投资/子公司</span><span><i class="trade-node"></i>交易关系</span><span><i class="core"></i>核心企业</span><span><em class="edge-guarantee"></em>担保/质押</span><span><em class="edge-trade"></em>其他关系</span></div>
+<div class="graph-tools">
+<div aria-label="图谱层次" class="filter-group"><button class="active" data-filter="all">分类总览</button><button data-filter="risk">风险事项</button><button data-filter="equity">股权控制</button><button data-filter="investment">投资/子公司</button><button data-filter="trade">交易关系</button><button data-filter="guarantee">担保质押</button></div>
+<div class="graph-search"><span>⌕</span><input id="graphSearch" placeholder="搜索企业名称"/></div>
+<div class="zoom-group"><button id="zoomIn">＋</button><button id="zoomOut">－</button><button id="resetGraph">重置视图</button></div>
+</div>
+<div class="graph-stage">
+<svg aria-label="企业关联交易风险图谱" id="riskGraph" role="img" viewbox="0 0 1200 720"><defs><filter height="200%" id="nodeShadow" width="200%" x="-50%" y="-50%"><fedropshadow dx="0" dy="7" flood-color="#160204" flood-opacity=".55" stddeviation="7"></fedropshadow></filter></defs><g id="graphViewport"><g id="edgesLayer"></g><g id="nodesLayer"></g></g></svg>
+<aside class="node-detail" hidden="" id="nodeDetail"><button aria-label="关闭" id="closeNodeDetail">×</button><h3 id="detailName">—</h3><div id="detailBody"></div></aside>
+<div class="graph-tooltip" hidden="" id="graphTooltip"></div>
+</div>
+</section>
+<section class="decision-studio reveal-section result-enter result-section" data-enter="left" id="decisionSection">
+<header class="decision-studio-head"><h2>风险研判与对应建议</h2></header>
+<div class="decision-layout">
+<aside aria-label="风险等级分布" class="risk-pyramid-panel">
+<div class="pyramid-title"><strong>风险等级</strong><span>低 → 高</span></div>
+<div class="risk-pyramid risk-pyramid-shape" id="riskPyramid">
+<button class="pyramid-tier tier-critical" data-decision-filter="critical" type="button"><span>重大风险</span><b>0</b></button>
+<button class="pyramid-tier tier-high" data-decision-filter="high" type="button"><span>高风险</span><b>0</b></button>
+<button class="pyramid-tier tier-medium" data-decision-filter="medium" type="button"><span>中风险</span><b>0</b></button>
+<button class="pyramid-tier tier-low active" data-decision-filter="low" type="button"><span>低风险</span><b>0</b></button>
+</div>
+</aside>
+<div class="decision-matrix">
+<div aria-hidden="true" class="decision-matrix-head"><strong>风险</strong><strong>建议</strong></div>
+<div class="decision-board" id="decisionCards"></div>
+</div>
+</div>
+<div class="sr-only"><ol id="findingsList"></ol><ol id="recommendationsList"></ol></div>
+</section>
+<section class="analysis-workbench reveal-section result-enter result-section" data-enter="right" id="workbenchSection">
+<header class="workbench-header">
+<div><h2>可解释决策工作台</h2></div>
+<div aria-label="决策工作台" class="workbench-tabs" role="tablist">
+<button aria-selected="true" class="active" data-workbench-tab="shap" role="tab" type="button">风险归因</button>
+<button aria-selected="false" data-workbench-tab="roi" role="tab" type="button">ROI 测算</button>
+</div>
+</header>
+<div class="workbench-body">
+<article class="workbench-view is-active" data-workbench-view="shap" role="tabpanel">
+<div class="view-toolbar"><div><span class="view-index">A</span><div><h3>SHAP 风险贡献</h3></div></div><button class="quiet-action" id="exportShap">导出 CSV ↗</button></div>
+<div class="table-wrap"><table><thead><tr><th>特征名称</th><th>贡献值</th><th>影响方向</th><th>数据依据</th></tr></thead><tbody id="shapBody"></tbody></table></div>
+</article>
+<article class="workbench-view" data-workbench-view="roi" hidden="" role="tabpanel">
+<div class="view-toolbar"><div><span class="view-index">B</span><div><h3>信贷审批 ROI</h3></div></div><button class="quiet-action" id="exportRoi">导出 CSV ↗</button></div>
+<div class="roi-layout">
+<div class="roi-form"><label>传统尽调天数<input id="traditionalDays" min="0" placeholder="请填写" step="0.1" type="number"/></label><label>系统尽调秒数<input id="systemSeconds" min="0" placeholder="报告生成后自动填写" readonly="" step="0.1" type="number"/></label><label>拟贷款金额（元）<input id="loanAmount" min="0" placeholder="请填写" step="10000" type="number"/></label><label>年资金成本率（%）<input id="annualRate" min="0" placeholder="请填写" step="0.01" type="number"/></label></div>
+<div class="roi-output"><span class="roi-eyebrow">ESTIMATED BENEFIT</span><div class="roi-result"><span>预计节省天数<strong id="savedDays">—</strong></span><span>预计单笔节省资金成本<strong id="savedCost">—</strong></span></div><p class="formula">节省天数 × 贷款金额 × 年资金成本率 ÷ 365</p></div>
+</div>
+</article>
+</div>
+</section>
+<section class="trace-section reveal-section result-enter result-section" data-enter="left" id="traceSection">
+<header class="trace-header"><div><h2>决策链路与可追溯记录</h2></div><div class="trace-controls"><button aria-label="向前查看" id="tracePrev" type="button">←</button><button aria-label="向后查看" id="traceNext" type="button">→</button></div></header>
+<div class="trace-viewport" id="traceViewport" tabindex="0"><div class="trace-list" id="decisionTrace"></div></div>
+<div class="trace-progress"><i id="traceProgress"></i></div>
+</section>
+<section class="evidence-ledger reveal-section result-enter result-section" data-enter="right" id="evidenceSection">
+<header class="evidence-header"><div><h2>公开证据来源</h2></div></header>
+<div class="quality-summary" id="qualitySummary"></div>
+<div class="source-list" id="sourceList"></div>
+</section>
+</div>
+<footer class="footer"><img alt="" src="/static/assets/logo.svg?v=20260802.4"/><span>链网E判 · 关联交易欺诈实时风险雷达</span><small>本系统仅使用公开网页证据进行初筛，不能替代法定尽职调查和人工审批。</small></footer>
+</main>
+<dialog aria-labelledby="errorDialogTitle" class="error-dialog" id="errorDialog">
+<div class="error-dialog-accent"></div>
+<div class="error-dialog-head"><span>!</span><div><small>QUERY INTERRUPTED</small><h2 id="errorDialogTitle">查询未完成</h2></div></div>
+<p id="errorDialogMessage">服务暂时不可用。</p>
+<code id="errorDialogCode"></code>
+<div class="error-dialog-actions"><button id="errorDialogClose" type="button">返回修改查询</button></div>
+</dialog>
+<script defer="" src="/static/report.js?v=20260802.4"></script>
+
+<aside aria-hidden="true" class="history-drawer" id="historyDrawer">
+<div class="history-backdrop" data-history-close=""></div>
+<section aria-labelledby="historyTitle" aria-modal="true" class="history-panel" role="dialog">
+<header><div><small>QUERY ARCHIVE</small><h2 id="historyTitle">历史查询</h2></div><button aria-label="关闭" data-history-close="" type="button">×</button></header>
+<div class="history-list" id="historyList"><p class="history-empty">正在读取历史记录…</p></div>
+</section>
+</aside>
+</body>
+</html>

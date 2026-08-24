@@ -1,0 +1,10 @@
+.env
+__pycache__/
+*.py[cod]
+.pytest_cache/
+runtime/
+.DS_Store
+.idea/
+.vscode/
+frontend/assets/video/*.mp4
+!frontend/assets/video/README.txt

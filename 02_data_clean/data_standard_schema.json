@@ -1,0 +1,12 @@
+{
+  "company_name": "string",
+  "credit_code": "string",
+  "legal_person": "string",
+  "registered_cap_num": "number",
+  "status": "string",
+  "annual_revenue": "number",
+  "employee_count": "integer",
+  "asset_total": "number",
+  "case_count": "integer",
+  "total_amount": "number"
+}
