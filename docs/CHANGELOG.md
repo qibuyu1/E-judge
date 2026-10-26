@@ -1,6 +1,31 @@
 # 链网E判 变更记录
 
-本文件汇总历史版本变更（v9.2 → v9.5.7）与 v9.5.6 自查报告，正文按版本倒序整理、原文保留。
+本文件汇总历史版本变更（v9.2 → v9.5.8）与 v9.5.6 自查报告，正文按版本倒序整理、原文保留。
+
+---
+
+## v9.5.8 · 运行环境守卫：Python 3.10 让模型调用静默失效
+
+> 构建号 `20260802.6`。「查询能出结果、但内容明显不对」的最终根因是部署机虚拟环境为 Python 3.10.12，而代码依赖 Python 3.11 才提供的 `asyncio.timeout()`。
+
+### 根因
+
+- `web_app/deepseek_client.py:646`、`web_app/stock_resolver.py:369`、`web_app/stock_resolver.py:404` 均使用 `async with asyncio.timeout(...)`。Python 3.10 上抛 `AttributeError: module 'asyncio' has no attribute 'timeout'`，异常被重试逻辑吞掉后整条链路降级为规则兜底。
+- 缓存库证据：`runtime/cache/research_cache.db` 中 2026-08-24 10:50（南京钢铁）至 2026-10-26 15:33（寒武纪）的全部报告均为 `token_usage=0`、`review_used=False`；期间出现法定代表人被填成「澳门金融管理局」、行业填成「第一」等信息错乱。
+- 换用 Python 3.12.15（服务器上 `uv venv venv312 --python 3.12`）后，同一查询「三一重工股份有限公司」为 `token_usage=73724`、`review_used=True`、风险分 68.0、置信度 84.7、41 条来源、24 个图谱节点。
+
+### 改动
+
+- `web_app/config.py`：新增模块级 `PYTHON_VERSION` / `PYTHON_SUPPORTED`，`Settings` 增加 `python_version`、`python_supported` 两个字段。
+- `web_app/main.py`：解释器低于 3.11 时启动即打印 WARNING；`/api/health` 新增 `python_version`、`python_supported`、`runtime_warnings` 三个字段。
+- `start_web.py`：解释器低于 3.11 时在启动横幅打印醒目警告与 3.12 虚拟环境创建命令。
+- `requirements.txt`：显式标注解释器要求 Python >= 3.11。
+- 前端资源版本号升到 `?v=20260802.6`，`CHAIN_BUILD_ID` 同步。
+
+### 升级提示
+
+- 版本号 `9.5.8`、构建号 `20260802.6`；`cache_schema_version` 仍为 `45`，历史报告不受影响。
+- 部署机必须使用 Python 3.11+。`GET /api/health` 的 `python_supported` 为 `false` 即代表模型调用全部失效，报告不可信。
 
 ---
 

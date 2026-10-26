@@ -39,6 +39,17 @@ def resolve_port(host: str, preferred: int, span: int = 20) -> tuple[int, list[i
 
 
 def main() -> None:
+    if not settings.python_supported:
+        print("=" * 68)
+        print(f"严重警告：当前 Python {settings.python_version} 低于 3.11。")
+        print("本项目依赖 asyncio.timeout（Python 3.11 新增），所有 DeepSeek 调用都会失败，")
+        print("报告会退化成规则兜底：页面能出结果，但公司信息、风险分、决策分析都不可信。")
+        print("请用 3.11+ 重新创建虚拟环境，例如：")
+        print("  uv venv venv312 --python 3.12")
+        print("  uv pip install --python venv312/bin/python -r requirements.txt")
+        print("然后让启动命令指向 venv312/bin/python。")
+        print("=" * 68)
+
     host = settings.host
     preferred = settings.port
     port, skipped = resolve_port(host, preferred)

@@ -1,5 +1,18 @@
 # 部署与排查
 
+## 运行环境要求（务必先看）
+
+- **Python >= 3.11**，推荐 3.12。`web_app/deepseek_client.py:646`、`web_app/stock_resolver.py:369`、`web_app/stock_resolver.py:404` 使用 `asyncio.timeout()`，该 API 从 Python 3.11 才有。
+- 用 3.10 跑不会报错退出，但每一次 DeepSeek 调用都会抛 `AttributeError: module 'asyncio' has no attribute 'timeout'` 并降级成规则兜底：页面照常出报告，但公司信息、风险分、决策分析全部不可信。线上服务器曾因此在 Python 3.10.12 上静默退化两个多月。
+- 自查方式：`GET /api/health` 看 `python_supported`（必须为 `true`）与 `python_version`；也可用 `systemctl cat ejudge` 确认 ExecStart 指向的解释器路径。
+- 用 uv 建 3.12 环境（无需 root）：
+
+```bash
+uv venv venv312 --python 3.12
+uv pip install --python venv312/bin/python -r requirements.txt
+# 再把启动命令指向 venv312/bin/python（systemd 的 ExecStart 或 supervisor 配置）
+```
+
 ## 启动
 
 1. 运行 `scripts/install.bat`。
@@ -25,6 +38,15 @@
 2. 重启后核对 `GET /api/health` 返回 `version: 9.5.7`、`build_id: 20260802.5`。
 3. 浏览器 `Ctrl+F5` 强刷；前端资源已带 `?v=20260802.5`，正常情况下会自动失效重取。
 4. 若前面挂着 Cloudflare，建议对 `/` 与 `/static/*` 清一次缓存，避免浏览器仍拿到旧的 `query.js` / `report.js`。
+
+## 服务器更新到 v9.5.8
+
+本次为环境守卫版本，未改缓存结构（`cache_schema_version` 仍为 `45`）与数据结构。
+
+1. 确认部署机解释器是 3.11+（见上节）；仍是 3.10 的先按上面 uv 步骤换环境，否则本次更新没有任何效果。
+2. `git pull` 后重启服务，核对 `GET /api/health` 返回 `version: 9.5.8`、`build_id: 20260802.6`、`python_supported: true`。
+3. 浏览器 `Ctrl+F5` 强刷；前端资源已带 `?v=20260802.6`。
+4. 挂 Cloudflare 的话，对 `/` 与 `/static/*` 清一次缓存。
 
 ## 检查
 

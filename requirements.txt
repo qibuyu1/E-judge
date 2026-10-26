@@ -1,3 +1,5 @@
+# 解释器要求：Python >= 3.11（web_app 使用 asyncio.timeout；3.10 会让所有
+# DeepSeek 调用失败并静默退化为规则兜底，报告内容不可信）。
 fastapi>=0.115,<1
 uvicorn[standard]>=0.30,<1
 pydantic>=2.8,<3

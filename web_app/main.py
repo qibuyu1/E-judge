@@ -23,6 +23,13 @@ logging.basicConfig(
     format="%(asctime)s %(levelname)s %(name)s - %(message)s",
 )
 
+if not settings.python_supported:
+    logging.getLogger(__name__).warning(
+        "Python %s 低于 3.11：asyncio.timeout 不可用，所有 DeepSeek 调用都会失败，"
+        "报告将退化为规则兜底。请使用 Python 3.11+ 创建虚拟环境后重启。",
+        settings.python_version,
+    )
+
 FRONTEND = ROOT / "frontend"
 app = FastAPI(
     title="链网E判",
@@ -99,6 +106,12 @@ def health() -> Dict[str, Any]:
         "stock_resolver_enabled": settings.stock_resolver_enabled,
         "extract_enabled": settings.tavily_extract_enabled,
         "deepseek_key_count": len(settings.api_keys),
+        "python_version": settings.python_version,
+        "python_supported": settings.python_supported,
+        "runtime_warnings": [] if settings.python_supported else [
+            f"当前 Python {settings.python_version} 低于 3.11，asyncio.timeout 不可用，"
+            "DeepSeek 调用会全部失败，报告将退化为规则兜底，请改用 Python 3.11+ 运行"
+        ],
     }
 
 

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+import sys
 from dataclasses import dataclass
 from pathlib import Path
 from typing import List
@@ -9,6 +10,14 @@ from dotenv import load_dotenv
 
 ROOT = Path(__file__).resolve().parents[1]
 load_dotenv(ROOT / ".env", override=False)
+
+PYTHON_VERSION = f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}"
+# asyncio.timeout() 是 Python 3.11 才有的 API，web_app/deepseek_client.py 与
+# web_app/stock_resolver.py 都依赖它。低于 3.11 时每次 DeepSeek 调用都会抛
+# AttributeError: module 'asyncio' has no attribute 'timeout'，异常被重试逻辑吞掉后
+# 报告会退化成规则兜底——页面照样出结果，但公司信息、风险分、决策分析全部不可信。
+# 服务器历史上正是因为 Python 3.10 环境静默退化了两三个月，所以这里显式暴露版本状态。
+PYTHON_SUPPORTED = sys.version_info >= (3, 11)
 
 
 def _as_bool(name: str, default: bool) -> bool:
@@ -52,9 +61,11 @@ def _extract_depth(name: str, default: str) -> str:
 @dataclass(frozen=True)
 class Settings:
     app_name: str = "链网E判"
-    app_version: str = "9.5.7"
-    build_id: str = "20260802.5"
+    app_version: str = "9.5.8"
+    build_id: str = "20260802.6"
     cache_schema_version: str = "45"
+    python_version: str = PYTHON_VERSION
+    python_supported: bool = PYTHON_SUPPORTED
     host: str = os.getenv("APP_HOST", "127.0.0.1")
     port: int = _as_int("APP_PORT", 8000, 1, 65535)
 

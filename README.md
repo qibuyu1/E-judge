@@ -38,7 +38,7 @@
 4. scripts\start_web.bat        启动服务
 ```
 
-等价的手动方式：
+等价的手动方式（**需 Python 3.11+**，推荐 3.12；3.10 会让所有模型调用静默失效）：
 
 ```powershell
 python -m pip install -r requirements.txt

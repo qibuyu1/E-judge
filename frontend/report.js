@@ -1,6 +1,6 @@
 "use strict";
 
-const CHAIN_BUILD_ID = "20260802.5"; // compatibility: 20260802.4
+const CHAIN_BUILD_ID = "20260802.6"; // compatibility: 20260802.5
 
 const $ = (selector, root = document) => root.querySelector(selector);
 const $$ = (selector, root = document) => Array.from(root.querySelectorAll(selector));
