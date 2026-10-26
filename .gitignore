@@ -8,3 +8,7 @@ runtime/
 .vscode/
 frontend/assets/video/*.mp4
 !frontend/assets/video/README.txt
+venv/
+.venv/
+*.log
+nohup.out
