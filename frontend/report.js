@@ -1,6 +1,6 @@
 "use strict";
 
-const CHAIN_BUILD_ID = "20260802.4"; // compatibility: 20260729.3
+const CHAIN_BUILD_ID = "20260802.5"; // compatibility: 20260802.4
 
 const $ = (selector, root = document) => root.querySelector(selector);
 const $$ = (selector, root = document) => Array.from(root.querySelectorAll(selector));
@@ -57,16 +57,59 @@ function relationClass(relation = "") {
 const isMissing = (value) => value === null || value === undefined || value === "" || String(value).trim().toLowerCase() === "null" || String(value).trim().toLowerCase() === "undefined";
 const unknownText = (value, suffix = "") => isMissing(value) ? "未获取" : `${value}${suffix}`;
 
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+// 后端 detail 可能是字符串，也可能是 FastAPI/pydantic 的错误数组；统一摊平成可读中文。
+function describeApiError(detail, status) {
+  const clean = (text) => String(text).replace(/^value error[,:]\s*/i, "").trim();
+  if (Array.isArray(detail)) {
+    const messages = detail.map((item) => {
+      if (!item) return "";
+      if (typeof item === "string") return clean(item);
+      if (typeof item.msg === "string") return clean(item.msg);
+      if (typeof item.message === "string") return clean(item.message);
+      return "";
+    }).filter(Boolean);
+    if (messages.length) return messages.join("；");
+  } else if (detail && typeof detail === "object") {
+    if (typeof detail.msg === "string" && detail.msg.trim()) return clean(detail.msg);
+    if (typeof detail.message === "string" && detail.message.trim()) return clean(detail.message);
+  } else if (typeof detail === "string" && detail.trim()) {
+    return clean(detail);
+  }
+  return `请求失败（${status}）`;
+}
+
+// 网络抖动（断连、TLS 握手超时）没有 code/status；后端错误都会带上。
+function isTransientError(error) {
+  if (!error) return true;
+  if (!error.code && !error.status) return true;
+  const code = Number(error.status);
+  return code >= 500 || code === 429;
+}
+
 async function fetchJSON(url, options = {}) {
   const response = await fetch(url, { cache: "no-store", headers: { "Content-Type": "application/json", "X-Chain-Risk-Build": CHAIN_BUILD_ID, ...(options.headers || {}) }, ...options });
   let data = {};
   try { data = await response.json(); } catch (_) { data = {}; }
   if (!response.ok) {
-    const error = new Error(data.detail || `请求失败（${response.status}）`);
+    const error = new Error(describeApiError(data.detail, response.status));
     error.code = data.code || `HTTP_${response.status}`;
+    error.status = response.status;
     throw error;
   }
   return data;
+}
+
+async function fetchJSONRetry(url, options = {}, attempts = 3, delayMs = 900) {
+  for (let attempt = 1; ; attempt += 1) {
+    try {
+      return await fetchJSON(url, options);
+    } catch (error) {
+      if (attempt >= attempts || !isTransientError(error)) throw error;
+      await sleep(delayMs * attempt);
+    }
+  }
 }
 
 
@@ -1118,8 +1161,8 @@ async function loadReportFromLocation() {
   }
   try {
     let report;
-    try { report = await fetchJSON(`/api/reports/${encodeURIComponent(id)}`); }
-    catch (_) { report = await fetchJSON(`/api/history/${encodeURIComponent(id)}`); }
+    try { report = await fetchJSONRetry(`/api/reports/${encodeURIComponent(id)}`); }
+    catch (_) { report = await fetchJSONRetry(`/api/history/${encodeURIComponent(id)}`); }
     state.report = report;
     renderReport(report);
     document.title = `${report.company?.short_name || report.company?.name || "企业"}｜链网E判完整报告`;

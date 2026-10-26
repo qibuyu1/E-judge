@@ -50,4 +50,4 @@
 - 构建：20260726.4
 - 缓存结构：35
 
-升级时必须解压到新目录，根据新版 `.env.template` 新建 `.env`，只复制 API Key，并运行 `reset_cache.bat` 后重新启动。
+升级时必须解压到新目录，根据新版 `.env.example` 新建 `.env`，只复制 API Key，并运行 `scripts/reset_cache.bat` 后重新启动。

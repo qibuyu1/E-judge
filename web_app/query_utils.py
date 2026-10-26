@@ -109,7 +109,9 @@ def parse_entity_query(value: str) -> EntityQuery:
         )
 
     if len(normalized) < 4:
-        raise QueryValidationError("企业名称过短，请输入较完整的企业名称")
+        raise QueryValidationError(
+            "企业名称过短，请输入完整企业名称（例如「比亚迪股份有限公司」），或直接输入 6 位股票代码"
+        )
     if not re.search(r"[\u4e00-\u9fffA-Za-z]", normalized):
         raise QueryValidationError("请输入有效企业名称、股票代码或统一社会信用代码")
     return EntityQuery(raw=value, normalized=normalized, query_type="company_name")

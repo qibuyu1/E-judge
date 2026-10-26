@@ -11,7 +11,7 @@ from uuid import uuid4
 
 try:
     from openai import AsyncOpenAI
-except ImportError:  # installed by install.bat in normal use
+except ImportError:  # installed by scripts/install.bat in normal use
     AsyncOpenAI = None  # type: ignore
 from pydantic import BaseModel, ValidationError
 
@@ -443,7 +443,7 @@ class DeepSeekClient:
 
     def _client(self):
         if AsyncOpenAI is None:
-            raise DeepSeekConfigurationError("缺少openai依赖，请先运行 install.bat")
+            raise DeepSeekConfigurationError("缺少openai依赖，请先运行 scripts/install.bat")
         return AsyncOpenAI(
             api_key=self._next_key(),
             base_url=settings.deepseek_base_url,

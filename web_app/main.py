@@ -1,9 +1,11 @@
 from __future__ import annotations
 
 import logging
+import re
 from typing import Any, Dict
 
 from fastapi import FastAPI, HTTPException, Query, Request
+from fastapi.exceptions import RequestValidationError
 from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 
@@ -44,6 +46,30 @@ async def disable_stale_frontend_cache(request: Request, call_next):
 @app.exception_handler(QueryValidationError)
 async def query_validation_error(_: Request, exc: QueryValidationError) -> JSONResponse:
     return JSONResponse(status_code=422, content={"detail": str(exc), "code": "INVALID_QUERY"})
+
+
+def _flatten_validation_errors(errors: Any) -> str:
+    """把 pydantic 的结构化校验错误摊平成一句可读中文。"""
+    messages: list[str] = []
+    for error in errors or []:
+        if not isinstance(error, dict):
+            continue
+        message = str(error.get("msg") or "").strip()
+        if not message:
+            continue
+        message = re.sub(r"^value error[,:]\s*", "", message, flags=re.IGNORECASE).strip()
+        if message and message not in messages:
+            messages.append(message)
+    return "；".join(messages) or "请求参数校验失败"
+
+
+@app.exception_handler(RequestValidationError)
+async def request_validation_error(_: Request, exc: RequestValidationError) -> JSONResponse:
+    """前端只接受字符串 detail；模型层校验失败也要返回同样的形状，避免弹窗显示 [object Object]。"""
+    return JSONResponse(
+        status_code=422,
+        content={"detail": _flatten_validation_errors(exc.errors()), "code": "INVALID_QUERY"},
+    )
 
 
 @app.get("/")

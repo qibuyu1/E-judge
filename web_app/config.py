@@ -52,8 +52,8 @@ def _extract_depth(name: str, default: str) -> str:
 @dataclass(frozen=True)
 class Settings:
     app_name: str = "链网E判"
-    app_version: str = "9.5.5"
-    build_id: str = "20260802.3"
+    app_version: str = "9.5.7"
+    build_id: str = "20260802.5"
     cache_schema_version: str = "45"
     host: str = os.getenv("APP_HOST", "127.0.0.1")
     port: int = _as_int("APP_PORT", 8000, 1, 65535)

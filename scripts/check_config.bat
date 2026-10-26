@@ -1,4 +1,5 @@
 @echo off
 chcp 65001 >nul
-python check_config.py
+cd /d "%~dp0.."
+python scripts\check_config.py
 pause

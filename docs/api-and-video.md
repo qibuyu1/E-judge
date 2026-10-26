@@ -2,7 +2,7 @@
 
 ## API
 
-复制根目录 `.env.template` 为 `.env`：
+复制根目录 `.env.example` 为 `.env`：
 
 ```env
 TAVILY_API_KEY=你的Tavily_API_Key

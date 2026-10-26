@@ -1,5 +1,6 @@
 @echo off
 chcp 65001 >nul
+cd /d "%~dp0.."
 if exist runtime\cache\research_cache.db del /f /q runtime\cache\research_cache.db
 if exist runtime\cache\research_cache.db-shm del /f /q runtime\cache\research_cache.db-shm
 if exist runtime\cache\research_cache.db-wal del /f /q runtime\cache\research_cache.db-wal

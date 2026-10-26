@@ -1,11 +1,42 @@
 "use strict";
 
-const CHAIN_BUILD_ID = "20260802.3"; // compatibility: 20260729.3
+const CHAIN_BUILD_ID = "20260802.5"; // compatibility: 20260802.4
 const $ = (selector, root = document) => root.querySelector(selector);
 const $$ = (selector, root = document) => Array.from(root.querySelectorAll(selector));
 const escapeHTML = (value) => String(value ?? "").replace(/[&<>'"]/g, (ch) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#039;", '"': "&quot;" }[ch]));
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 let polling = false;
 let runtimeConfig = { checked: false, ready: false, missing: [], error: "" };
+
+// 后端 detail 可能是字符串，也可能是 FastAPI/pydantic 的错误数组；
+// 直接塞进 new Error() 会显示成 “[object Object]”，这里统一摊平成可读中文。
+function describeApiError(detail, status) {
+  const clean = (text) => String(text).replace(/^value error[,:]\s*/i, "").trim();
+  if (Array.isArray(detail)) {
+    const messages = detail.map((item) => {
+      if (!item) return "";
+      if (typeof item === "string") return clean(item);
+      if (typeof item.msg === "string") return clean(item.msg);
+      if (typeof item.message === "string") return clean(item.message);
+      return "";
+    }).filter(Boolean);
+    if (messages.length) return messages.join("；");
+  } else if (detail && typeof detail === "object") {
+    if (typeof detail.msg === "string" && detail.msg.trim()) return clean(detail.msg);
+    if (typeof detail.message === "string" && detail.message.trim()) return clean(detail.message);
+  } else if (typeof detail === "string" && detail.trim()) {
+    return clean(detail);
+  }
+  return `请求失败（${status}）`;
+}
+
+// fetch() 抛出的网络错误（断连、TLS 握手超时）没有 code/status；后端错误都会挂上两者。
+function isTransientError(error) {
+  if (!error) return true;
+  if (!error.code && !error.status) return true;
+  const code = Number(error.status);
+  return code >= 500 || code === 429;
+}
 
 async function fetchJSON(url, options = {}) {
   const response = await fetch(url, {
@@ -16,11 +47,24 @@ async function fetchJSON(url, options = {}) {
   let data = {};
   try { data = await response.json(); } catch (_) { data = {}; }
   if (!response.ok) {
-    const error = new Error(data.detail || `请求失败（${response.status}）`);
+    const error = new Error(describeApiError(data.detail, response.status));
     error.code = data.code || `HTTP_${response.status}`;
+    error.status = response.status;
     throw error;
   }
   return data;
+}
+
+// 一次网络抖动不应该让整次分析直接报「分析失败」：瞬时错误自动重试。
+async function fetchJSONRetry(url, options = {}, attempts = 3, delayMs = 900) {
+  for (let attempt = 1; ; attempt += 1) {
+    try {
+      return await fetchJSON(url, options);
+    } catch (error) {
+      if (attempt >= attempts || !isTransientError(error)) throw error;
+      await sleep(delayMs * attempt);
+    }
+  }
 }
 
 const landing = $("#landing");
@@ -133,11 +177,26 @@ async function runAnalysis(query) {
   updateProgress({ progress: 0, stage: "启动", message: "正在创建实时尽调任务" });
   requestAnimationFrame(() => loadingPanel.scrollIntoView({ behavior: "smooth", block: "nearest" }));
   try {
-    const validation = await fetchJSON("/api/validate-query", { method: "POST", body: JSON.stringify({ query, force_refresh: false }) });
+    const validation = await fetchJSONRetry("/api/validate-query", { method: "POST", body: JSON.stringify({ query, force_refresh: false }) });
     $("#companyQuery").value = validation.normalized || query;
-    const task = await fetchJSON("/api/research", { method: "POST", body: JSON.stringify({ query: validation.normalized || query, force_refresh: false }) });
+    const task = await fetchJSONRetry("/api/research", { method: "POST", body: JSON.stringify({ query: validation.normalized || query, force_refresh: false }) }, 2, 1200);
+    // 轮询阶段容忍连续的网络抖动，避免服务端仍在跑却提前报错。
+    let transientFailures = 0;
+    const MAX_TRANSIENT_FAILURES = 12;
     while (polling) {
-      const status = await fetchJSON(`/api/research/${encodeURIComponent(task.task_id)}`);
+      let status = null;
+      try {
+        status = await fetchJSON(`/api/research/${encodeURIComponent(task.task_id)}`);
+      } catch (pollError) {
+        if (isTransientError(pollError) && transientFailures < MAX_TRANSIENT_FAILURES) {
+          transientFailures += 1;
+          $("#loadingText").textContent = `网络波动，正在重试（${transientFailures}/${MAX_TRANSIENT_FAILURES}）…`;
+          await sleep(1200);
+          continue;
+        }
+        throw pollError;
+      }
+      transientFailures = 0;
       updateProgress(status);
       if (status.status === "failed") {
         const error = new Error(status.error || "尽调任务未完成");
